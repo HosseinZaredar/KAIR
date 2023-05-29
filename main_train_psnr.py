@@ -234,8 +234,14 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                     util.imsave(E_img, save_img_path)
 
                     # -----------------------
-                    # calculate PSNR
+                    # calculate PSNR_Y
                     # -----------------------
+                    E_img = E_img[:, :, [2, 1, 0]]
+                    H_img = H_img[:, :, [2, 1, 0]]
+
+                    E_img = util.bgr2ycbcr(E_img.astype(np.float32) / 255.) * 255.
+                    H_img = util.bgr2ycbcr(H_img.astype(np.float32) / 255.) * 255.
+
                     current_psnr = util.calculate_psnr(E_img, H_img, border=border)
 
                     logger.info('{:->4d}--> {:>10s} | {:<4.2f}dB'.format(idx, image_name_ext, current_psnr))

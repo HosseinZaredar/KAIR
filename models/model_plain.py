@@ -152,6 +152,12 @@ class ModelPlain(ModelBase):
             self.H = data['H'].to(self.device)
 
     # ----------------------------------------
+    # feed L to netE
+    # ----------------------------------------
+    def netE_forward(self):
+        self.E = self.netE(self.L)
+    
+    # ----------------------------------------
     # feed L to netG
     # ----------------------------------------
     def netG_forward(self):
@@ -196,10 +202,8 @@ class ModelPlain(ModelBase):
     # test / inference
     # ----------------------------------------
     def test(self):
-        self.netG.eval()
         with torch.no_grad():
-            self.netG_forward()
-        self.netG.train()
+            self.netE_forward()
 
     # ----------------------------------------
     # test / inference x8
