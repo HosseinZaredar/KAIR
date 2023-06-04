@@ -6,7 +6,13 @@ from multiprocessing import Pool
 from os import path as osp
 from tqdm import tqdm
 
-from utils.utils_video import scandir
+try:
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__)))))
+    from utils.utils_video import scandir
+except ImportError:
+    pass
+
 
 def main():
     """A multi-thread tool to crop large images to sub-images for faster IO.
@@ -43,34 +49,18 @@ def main():
     opt['compression_level'] = 3
 
     # HR images
-    opt['input_folder'] = 'trainsets/DIV2K/DIV2K_train_HR'
-    opt['save_folder'] = 'trainsets/DIV2K/DIV2K_train_HR_sub'
-    opt['crop_size'] = 480
-    opt['step'] = 240
-    opt['thresh_size'] = 0
-    extract_subimages(opt)
-
-    # LRx2 images
-    opt['input_folder'] = 'trainsets/DIV2K/DIV2K_train_LR_bicubic/X2'
-    opt['save_folder'] = 'trainsets/DIV2K/DIV2K_train_LR_bicubic/X2_sub'
-    opt['crop_size'] = 240
-    opt['step'] = 120
-    opt['thresh_size'] = 0
-    extract_subimages(opt)
-
-    # LRx3 images
-    opt['input_folder'] = 'trainsets/DIV2K/DIV2K_train_LR_bicubic/X3'
-    opt['save_folder'] = 'trainsets/DIV2K/DIV2K_train_LR_bicubic/X3_sub'
-    opt['crop_size'] = 160
-    opt['step'] = 80
+    opt['input_folder'] = '../trainsets/HR/x4'
+    opt['save_folder'] = '../trainsets/HR_sub/x4'
+    opt['crop_size'] = 256
+    opt['step'] = 128
     opt['thresh_size'] = 0
     extract_subimages(opt)
 
     # LRx4 images
-    opt['input_folder'] = 'trainsets/DIV2K/DIV2K_train_LR_bicubic/X4'
-    opt['save_folder'] = 'trainsets/DIV2K/DIV2K_train_LR_bicubic/X4_sub'
-    opt['crop_size'] = 120
-    opt['step'] = 60
+    opt['input_folder'] = '../trainsets/LR/x4'
+    opt['save_folder'] = '../trainsets/LR_sub/x4'
+    opt['crop_size'] = 64
+    opt['step'] = 32
     opt['thresh_size'] = 0
     extract_subimages(opt)
 
