@@ -43,6 +43,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     parser.add_argument('--opt', type=str, default=json_path, help='Path to option JSON file.')
     parser.add_argument('--launcher', default='pytorch', help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+    parser.add_argument('--tensorboard', default=True)
     parser.add_argument('--dist', default=False)
 
     opt = option.parse(parser.parse_args().opt, is_train=True)
@@ -92,6 +93,16 @@ def main(json_path='options/train_msrresnet_psnr.json'):
         utils_logger.logger_info(logger_name, os.path.join(opt['path']['log'], logger_name+'.log'))
         logger = logging.getLogger(logger_name)
         logger.info(option.dict2str(opt))
+
+    # ----------------------------------------
+    # tensorboard setting
+    # ----------------------------------------
+    opt['tensorboard'] = parser.parse_args().tensorboard
+    if opt['tensorboard']:
+        from datetime import datetime
+        from torch.utils.tensorboard import SummaryWriter
+        run_name = f'{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}'
+        writer = SummaryWriter(os.path.join(opt['path']['log'], 'tensorboard', run_name))
 
     # ----------------------------------------
     # seed
@@ -196,6 +207,10 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                 for k, v in logs.items():  # merge log information into message
                     message += '{:s}: {:.3e} '.format(k, v)
                 logger.info(message)
+                if opt['tensorboard']:
+                    loss = logs['G_loss']
+                    writer.add_scalar('train/lr', model.current_learning_rate(), current_step)
+                    writer.add_scalar('train/l1_loss', loss, current_step)
 
             # -------------------------------
             # 5) save model
@@ -252,6 +267,9 @@ def main(json_path='options/train_msrresnet_psnr.json'):
 
                 # testing log
                 logger.info('<epoch:{:3d}, iter:{:8,d}, Average PSNR : {:<.2f}dB\n'.format(epoch, current_step, avg_psnr))
+                if opt['tensorboard']:
+                    writer.add_scalar('metrics/psnr', avg_psnr, current_step)
+
 
 if __name__ == '__main__':
     main()
